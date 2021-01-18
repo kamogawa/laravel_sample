@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\BoardUser;
+use App\Models\BoardContents;
 
 class BoardController extends Controller
 {
@@ -14,7 +15,7 @@ class BoardController extends Controller
     public function loginUser(Request $request) {
         $email = $request->input('email');
         $password = $request->input('password');
-        $user = User::whereRaw('email = ? and password = ?', [$email, $password] ); 
+        $user = BoardUser::whereRaw('email = ? and password = ?', [$email, $password] ); 
         
         if ( $user->count() > 0 ) {
             // ログイン成功
@@ -29,6 +30,24 @@ class BoardController extends Controller
     }
 
     public function listView() {
-        return view('board.contents.list')->with('contents', 'ログイン成功');
+        $contents = BoardContents::orderBy('id', 'desc')->paginate(5);
+        $contents->setPath('/list');
+        return view('board.contents.list')->with('contents', $contents);
+    }
+
+    public function addForm() {
+        return view('board.contents.add');
+    }
+    
+    public function add(Request $request) {
+        $title = $request->input('title');
+        $contents = $request->input('contents');
+        $boardContents = new BoardContents();
+        $boardContents->title = $title;
+        $boardContents->contents = $contents;
+        $boardContents->reg_user_id = $request->session()->get('user_id');
+        $boardContents->reg_user_name = $request->session()->get('user_name');
+        $boardContents->save();
+        return redirect('/list');
     }
 }

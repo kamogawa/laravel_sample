@@ -10,6 +10,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> 
   </head>
   <body class="container">
+    <div class="page-header">
+      <h1><small>laravel勉強会</small></h1>
+    </div>
     @yield('content')
   </body>
 </html>
