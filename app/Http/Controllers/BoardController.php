@@ -50,4 +50,35 @@ class BoardController extends Controller
         $boardContents->save();
         return redirect('/list');
     }
+
+    public function view(Request $request) {
+        $pageid = $request->input('pageid');
+        BoardContents::whereRaw('id = ?', [$pageid])->increment('view_count');
+        $contents = BoardContents::find($pageid);
+        return view('board.contents.view')->with('contents', $contents)->with('pageid', $pageid);
+    }
+
+    public function editForm(Request $request) {
+        $pageid = $request->input('pageid');
+        $boardContents = BoardContents::find($pageid);
+        return view('board.contents.edit')->with('contents', $boardContents)->with('pageid', $pageid); 
+    }
+    
+    public function edit(Request $request) {
+        $pageid = $request->input('pageid');
+        $title = $request->input('title');
+        $contents = $request->input('contents');
+        $boardContents = BoardContents::find($pageid);
+        $boardContents->title = $title;
+        $boardContents->contents = $contents;
+        $boardContents->save();
+        return redirect('/view?pageid='.$pageid);
+    }
+
+    public function delete(Request $request) {
+        $pageid = $request->input('pageid');
+        $boardContents = BoardContents::whereRaw('id = ?', [$pageid]);
+        $boardContents->delete();
+        return redirect('/list');
+    }
 }
